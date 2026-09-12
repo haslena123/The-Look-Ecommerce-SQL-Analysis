@@ -1,0 +1,90 @@
+# Bisnis question : Country mana yang memiliki order terbanyak
+# Gabungkan tabel orders dan users
+
+SELECT o.order_id,
+        o.user_id,
+        o.status,
+        o.created_at,
+        u.country,
+
+FROM bigquery-public-data.thelook_ecommerce.orders AS o
+ INNER JOIN bigquery-public-data.thelook_ecommerce.users AS u
+ ON o.user_id = u.id;
+
+# Apakah semua kolom yang dibutuhkan sudah ada?
+# sudah ada
+
+# Apakah order_id terlihat unik?
+SELECT COUNT(*) AS total_rows,
+        COUNT(DISTINCT(order_id)) AS unique_order_id
+FROM (
+        SELECT o.order_id,
+        o.user_id,
+        o.status,
+        o.created_at,
+        u.country,
+
+        FROM bigquery-public-data.thelook_ecommerce.orders AS o
+        INNER JOIN bigquery-public-data.thelook_ecommerce.users AS u
+        ON o.user_id = u.id
+);
+
+# Insight : untuk order_id memiliki informasi nilai yang unik karena total data secara keseluruhan dengan total order_id memiliki jumlah yang sama.
+
+# Apakah ada country yang kosong?
+SELECT *
+FROM (
+        SELECT o.order_id,
+        o.user_id,
+        o.status,
+        o.created_at,
+        u.country,
+
+        FROM bigquery-public-data.thelook_ecommerce.orders AS o
+        INNER JOIN bigquery-public-data.thelook_ecommerce.users AS u
+        ON o.user_id = u.id
+)
+WHERE country IS NULL;
+
+# Insight : untuk masing - masing country memiliki jumlah order dan tidak ada country yang kosong.
+
+SELECT DISTINCT(status)
+FROM bigquery-public-data.thelook_ecommerce.orders;
+
+# Apakah status memiliki nilai yang wajar?
+
+SELECT status,
+        COUNT(*) AS jumlah
+        
+FROM (
+        SELECT o.order_id,
+        o.user_id,
+        o.status,
+        o.created_at,
+        u.country,
+
+        FROM bigquery-public-data.thelook_ecommerce.orders AS o
+        INNER JOIN bigquery-public-data.thelook_ecommerce.users AS u
+        ON o.user_id = u.id
+)
+GROUP BY status
+ORDER BY jumlah DESC; 
+
+# Insight : untuk masing - masing status memiliki nilai yang wajar dan jumlahnya sesuai dengan total baris
+
+# Berapa jumlah baris dataset final?
+
+SELECT COUNT(*) AS jumlah_baris
+FROM (
+        SELECT o.order_id,
+        o.user_id,
+        o.status,
+        o.created_at,
+        u.country,
+
+        FROM bigquery-public-data.thelook_ecommerce.orders AS o
+        INNER JOIN bigquery-public-data.thelook_ecommerce.users AS u
+        ON o.user_id = u.id
+);
+
+# Insight : jumlah baris dataset final berjumlah 125345.
